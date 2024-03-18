@@ -3,12 +3,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text, View } from 'react-native';
 
-import Details from '../screens/details';
-import Overview from '../screens/overview';
+import Details from '~/screens/details';
+import Login from '~/screens/login';
+import Overview from '~/screens/overview';
 
 export type RootStackParamList = {
   Overview: undefined;
   Details: { name: string };
+  Login: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -16,7 +18,8 @@ const Stack = createStackNavigator<RootStackParamList>();
 export default function RootStack() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Overview">
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Overview" component={Overview} />
         <Stack.Screen
           name="Details"
