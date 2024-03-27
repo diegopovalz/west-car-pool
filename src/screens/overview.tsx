@@ -16,9 +16,7 @@ export default function Overview() {
           <Text className={styles.title}>Hello World</Text>
           <Text className={styles.subtitle}>This is the first page of your app.</Text>
         </View>
-        <TouchableOpacity
-          className={styles.button}
-          onPress={() => navigation.navigate('Details', { name: 'Dan' })}>
+        <TouchableOpacity className={styles.button} onPress={() => navigation.navigate('Login')}>
           <Text className={styles.buttonText}>Show Details</Text>
         </TouchableOpacity>
       </View>

@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View, Text, TextInput, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
@@ -9,20 +9,31 @@ import { auth } from 'utils/firebase';
 
 import { RootStackParamList } from '~/navigation';
 
-type LoginScreenNavigationProps = StackNavigationProp<RootStackParamList, 'Login'>;
+type SingUpScreenNavigationProps = StackNavigationProp<RootStackParamList, 'SignUp'>;
 
-const Login = () => {
+const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
-  const navigation = useNavigation<LoginScreenNavigationProps>();
+  const navigation = useNavigation<SingUpScreenNavigationProps>();
 
-  const signIn = async () => {
+  const signUp = async () => {
+    if (password !== confirmPassword) {
+      Toast.show({
+        type: 'error',
+        text1: t('errorHappened'),
+        text2: t('passwordNotMatch'),
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const user = await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('Overview');
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert(t('createAccountSuccess'));
+      navigation.navigate('Login');
     } catch (error: any) {
       Toast.show({
         type: 'error',
@@ -48,7 +59,7 @@ const Login = () => {
         <View className="w-96 bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <View className="p-6 space-y-4 md:space-y-6 sm:p-8 gap-4">
             <Text className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white text-center">
-              {t('signYourAcccount')}
+              {t('createAnAccount')}
             </Text>
             <View className="space-y-4 md:space-y-6">
               <View className="mb-3">
@@ -81,20 +92,28 @@ const Login = () => {
                   blurOnSubmit={false}
                 />
               </View>
+              <View className="mb-3">
+                <Text className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  {t('confirmPassword')}
+                </Text>
+                <TextInput
+                  secureTextEntry
+                  placeholder="••••••••"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-[#007d97] focus:border-[#007d97] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  blurOnSubmit={false}
+                />
+              </View>
               <TouchableOpacity
                 disabled={loading}
                 className="w-full bg-[#007d97] hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-[#007d97] dark:hover:bg-indigo-700 dark:focus:ring-indigo-800 mb-3"
-                onPress={signIn}>
+                onPress={signUp}>
                 {loading ? (
                   <ActivityIndicator />
                 ) : (
-                  <Text className="text-white text-center">{t('logIn')}</Text>
+                  <Text className="text-white text-center">{t('createAccount')}</Text>
                 )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('SignUp')}
-                className="w-full bg-[#007d97] hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-[#007d97] dark:hover:bg-indigo-700 dark:focus:ring-indigo-800">
-                <Text className="text-white text-center">{t('notRegistered')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -103,4 +122,4 @@ const Login = () => {
     </View>
   );
 };
-export default Login;
+export default SignUp;

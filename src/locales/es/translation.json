@@ -2,5 +2,13 @@
   "logIn": "Iniciar sesión",
   "signYourAcccount": "Inicia sesión en tu cuenta",
   "yourEmail": "Tu correo electrónico",
-  "yourPassword": "Tu contraseña"
+  "yourPassword": "Tu contraseña",
+  "errorHappened": "Ha ocurrido un error",
+  "invalidCredential": "Tus credenciales son inválidas. ¿Estás seguro de que has escrito tu correo electrónico y contraseña correctamente?",
+  "notRegistered": "¿No estás registrado? Hazlo aquí",
+  "createAnAccount": "Crear cuenta",
+  "confirmPassword": "Confirmar contraseña",
+  "passwordNotMatch": "Las contraseñas no coinciden",
+  "createAccount": "Crear cuenta",
+  "createAccountSuccess": "Tu cuenta ha sido creada con éxito"
 }

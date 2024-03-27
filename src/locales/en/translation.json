@@ -2,5 +2,13 @@
   "logIn": "Log In",
   "signYourAcccount": "Sign in to your account",
   "yourEmail": "Your email",
-  "yourPassword": "Your password"
+  "yourPassword": "Your password",
+  "errorHappened": "An error happened",
+  "invalidCredential": "Your credentials are invalid. Are you sure you entered the right email and password?",
+  "notRegistered": "Not registered? Sign up now",
+  "createAnAccount": "Create an account",
+  "confirmPassword": "Confirm password",
+  "passwordNotMatch": "Passwords do not match",
+  "createAccount": "Create account",
+  "createAccountSuccess": "Your account has been created successfully"
 }
