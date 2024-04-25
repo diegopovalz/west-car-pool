@@ -6,6 +6,7 @@ import 'intl-pluralrules';
 import LanguageDetector from '@os-team/i18next-react-native-language-detector';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { PaperProvider } from 'react-native-paper';
 
 import translationEN from '~/locales/en/translation.json';
 import translationES from '~/locales/es/translation.json';
@@ -33,5 +34,9 @@ i18n
   });
 
 export default function App() {
-  return <RootStack />;
+  return (
+    <PaperProvider>
+      <RootStack />
+    </PaperProvider>
+  );
 }

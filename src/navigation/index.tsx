@@ -6,6 +6,7 @@ import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 
 import Details from '~/screens/details';
 import Login from '~/screens/login';
+import Main from '~/screens/main';
 import Overview from '~/screens/overview';
 import SignUp from '~/screens/singup';
 
@@ -14,6 +15,7 @@ export type RootStackParamList = {
   Details: { name: string };
   Login: undefined;
   SignUp: undefined;
+  Main: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -27,32 +29,13 @@ export default function RootStack() {
   return (
     <>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-          <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
-          <Stack.Screen name="Overview" component={Overview} />
-          <Stack.Screen
-            name="Details"
-            component={Details}
-            options={({ navigation }) => ({
-              headerLeft: () => (
-                <View className={styles.backButton}>
-                  <Feather name="chevron-left" size={16} color="#007AFF" />
-                  <Text className={styles.backButtonText} onPress={navigation.goBack}>
-                    Back
-                  </Text>
-                </View>
-              ),
-            })}
-          />
+        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="Main" component={Main} />
         </Stack.Navigator>
       </NavigationContainer>
       <Toast config={toastConfig} />
     </>
   );
 }
-
-const styles = {
-  backButton: 'flex-row',
-  backButtonText: 'text-blue-500 ml-1',
-};

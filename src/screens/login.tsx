@@ -22,7 +22,7 @@ const Login = () => {
     setLoading(true);
     try {
       const user = await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('Overview');
+      navigation.navigate('Main');
     } catch (error: any) {
       Toast.show({
         type: 'error',
