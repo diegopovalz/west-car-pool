@@ -1,11 +1,12 @@
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { DataTable } from 'react-native-paper';
 
 import { NewModal as Modal } from '~/components';
 
-// Crea un arreglo de objetos con las propiedades dia (un dia de la semana por cada uno), y un objeto con las propiedades origen, destino, hora de salida y hora de llegada.
-const items = [
+let items = [
   {
     day: 'Lunes',
     origin: 'Casa',
@@ -50,13 +51,33 @@ const items = [
   },
 ];
 
-const modifyItem = (item: string, newItem: any) => {
-  const modifiedItems = items.map((i) => (i.day === item ? newItem : i));
-  return modifiedItems;
+const modifyItem = (item: string, newDate: string) => {
+  const modifiedItems = items.map((i) => (i.day === item ? { ...i, departureTime: newDate } : i));
+  items = modifiedItems;
 };
 
 export default function Main() {
   const [openModal, setOpenModal] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<string | null>('Lunes');
+  const [selectedDate, setSelectedDate] = useState(new Date(1598051730000));
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date | undefined) => {
+    if (!selectedDate) return;
+    if (event.type === 'dismissed') return;
+    const currentDate = selectedDate;
+    setSelectedDate(currentDate);
+    const minutes = currentDate.getMinutes();
+    const hour = currentDate.getHours();
+    modifyItem(
+      selectedDay!,
+      `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+    );
+    setShowTimePicker(false);
+    setOpenModal(false);
+    setSelectedDay('NA');
+  };
+
   return (
     <View className={styles.container}>
       <View className={styles.main}>
@@ -102,9 +123,45 @@ export default function Main() {
         </View>
       </View>
       <Modal visible={openModal}>
-        <Text>Modal</Text>
-        <Pressable onPress={() => setOpenModal(false)}>
-          <Text>Close</Text>
+        <Text className="text-xl">Selecciona el día</Text>
+        <View className="border border-gray my-2 w-40 h-10 rounded relative">
+          <Picker
+            selectedValue={selectedDay}
+            onValueChange={(itemValue, _) => {
+              setSelectedDay(itemValue);
+              setShowTimePicker(true);
+            }}
+            style={{
+              width: 150,
+              color: 'black',
+              backgroundColor: 'transparent',
+              margin: 20,
+              position: 'absolute',
+              left: -25,
+              top: -30,
+            }}>
+            <Picker.Item label="Escoger día" value="NA" />
+            <Picker.Item label="Lunes" value="Lunes" />
+            <Picker.Item label="Martes" value="Martes" />
+            <Picker.Item label="Miercoles" value="Miercoles" />
+            <Picker.Item label="Jueves" value="Jueves" />
+            <Picker.Item label="Viernes" value="Viernes" />
+            <Picker.Item label="Sabado" value="Sabado" />
+          </Picker>
+        </View>
+        {showTimePicker && (
+          <DateTimePicker
+            mode="time"
+            value={selectedDate}
+            onChange={onDateChange}
+            is24Hour
+            testID="dateTimePicker"
+          />
+        )}
+        <Pressable
+          className="bg-[#007d97] rounded-[28px] shadow-md p-4"
+          onPress={() => setOpenModal(false)}>
+          <Text className="text-white font-semibold text-center">Cancelar</Text>
         </Pressable>
       </Modal>
     </View>
