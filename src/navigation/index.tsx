@@ -1,13 +1,9 @@
-import { Feather } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Text, View } from 'react-native';
 import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 
-import Details from '~/screens/details';
 import Login from '~/screens/login';
 import Main from '~/screens/main';
-import Overview from '~/screens/overview';
 import SignUp from '~/screens/singup';
 
 export type RootStackParamList = {
