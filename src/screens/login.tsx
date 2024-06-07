@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -21,7 +22,8 @@ const Login = () => {
   const signIn = async () => {
     setLoading(true);
     try {
-      const user = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
+      await AsyncStorage.setItem('user', email);
       navigation.navigate('Main');
     } catch (error: any) {
       Toast.show({

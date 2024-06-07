@@ -1,10 +1,14 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { doc, getDoc, updateDoc } from 'firebase/firestore/lite';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { database } from 'utils/firebase';
 
 import { Header, NewModal, Schedule } from '~/components';
+import { RootStackParamList } from '~/navigation';
 
 const DAYS = {
   Lunes: 'MO',
@@ -16,7 +20,8 @@ const DAYS = {
 };
 
 const getSchedule = async () => {
-  const user = await getDoc(doc(database, 'users', 'prueba@prueba.com'));
+  const userEmail = (await AsyncStorage.getItem('user')) || 'prueba@prueba.com';
+  const user = await getDoc(doc(database, 'users', userEmail));
   const userData = user.data();
   console.log(userData);
 
@@ -105,10 +110,18 @@ const saveItems = async (items: any[]) => {
   }
 };
 
+type LoginScreenNavigationProps = StackNavigationProp<RootStackParamList, 'Main'>;
+
 export default function Main() {
   const [items, setItems] = useState<any>([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedDay, setSelectedDay] = useState<any>(null);
+  const navigation = useNavigation<LoginScreenNavigationProps>();
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('user');
+    navigation.navigate('Login');
+  };
 
   const handleAddSchedule = async () => {
     const dayObject = {
@@ -139,69 +152,71 @@ export default function Main() {
     <View className={styles.container}>
       <View className={styles.main}>
         <Header />
-        {items.length > 0 ? (
+        {!items && <Text className="mt-16">No hay horarios</Text>}
+        {items && items.length > 0 && (
           <>
             <Schedule items={items} />
-            <View className="flex-1 items-center justify-end max-h-[64px]">
-              <TouchableOpacity className={styles.button} onPress={() => setOpenModal(true)}>
-                <Text className={styles.buttonText}>Agregar horario</Text>
-              </TouchableOpacity>
-            </View>
-            <NewModal visible={openModal}>
-              <Text className="text-xl">Selecciona el día</Text>
-              <View className="border border-gray my-2 w-40 h-10 rounded relative">
-                <Picker
-                  selectedValue={selectedDay}
-                  onValueChange={(itemValue, _) => {
-                    setSelectedDay(itemValue);
-                  }}
-                  style={{
-                    width: 150,
-                    color: 'black',
-                    backgroundColor: 'transparent',
-                    margin: 20,
-                    position: 'absolute',
-                    left: -25,
-                    top: -30,
-                  }}>
-                  <Picker.Item label="Seleccionar" value="NA" />
-                  {!items.find((item: any) => item.day === 'Lunes') && (
-                    <Picker.Item label="Lunes" value="Lunes" />
-                  )}
-                  {!items.find((item: any) => item.day === 'Martes') && (
-                    <Picker.Item label="Martes" value="Martes" />
-                  )}
-                  {!items.find((item: any) => item.day === 'Miércoles') && (
-                    <Picker.Item label="Miércoles" value="Miércoles" />
-                  )}
-                  {!items.find((item: any) => item.day === 'Jueves') && (
-                    <Picker.Item label="Jueves" value="Jueves" />
-                  )}
-                  {!items.find((item: any) => item.day === 'Viernes') && (
-                    <Picker.Item label="Viernes" value="Viernes" />
-                  )}
-                  {!items.find((item: any) => item.day === 'Sábado') && (
-                    <Picker.Item label="Sábado" value="Sábado" />
-                  )}
-                </Picker>
-              </View>
-              <View className="flex-1 flex-row gap-3">
-                <Pressable
-                  className="bg-[#007d97] rounded-[28px] shadow-md p-4 h-14 w-24"
-                  onPress={handleAddSchedule}>
-                  <Text className="text-white font-semibold text-center text-sm">Agregar</Text>
-                </Pressable>
-                <Pressable
-                  className="bg-[#007d97] rounded-[28px] shadow-md p-4 h-14 w-24"
-                  onPress={() => setOpenModal(false)}>
-                  <Text className="text-white font-semibold text-center text-sm">Cancelar</Text>
-                </Pressable>
-              </View>
-            </NewModal>
           </>
-        ) : (
-          <Text>Cargando horarios...</Text>
         )}
+        <View className="flex-1 flex-row items-center justify-center max-h-[64px] gap-4">
+          <TouchableOpacity className={styles.button} onPress={() => setOpenModal(true)}>
+            <Text className={styles.buttonText}>Agregar horario</Text>
+          </TouchableOpacity>
+          <Pressable onPress={handleLogout} className={styles.button}>
+            <Text className={styles.buttonText}>Cerrar sesión</Text>
+          </Pressable>
+        </View>
+        <NewModal visible={openModal}>
+          <Text className="text-xl">Selecciona el día</Text>
+          <View className="border border-gray my-2 w-40 h-10 rounded relative">
+            <Picker
+              selectedValue={selectedDay}
+              onValueChange={(itemValue, _) => {
+                setSelectedDay(itemValue);
+              }}
+              style={{
+                width: 150,
+                color: 'black',
+                backgroundColor: 'transparent',
+                margin: 20,
+                position: 'absolute',
+                left: -25,
+                top: -30,
+              }}>
+              <Picker.Item label="Seleccionar" value="NA" />
+              {(!items?.find((item: any) => item.day === 'Lunes') || !items) && (
+                <Picker.Item label="Lunes" value="Lunes" />
+              )}
+              {(!items?.find((item: any) => item.day === 'Martes') || !items) && (
+                <Picker.Item label="Martes" value="Martes" />
+              )}
+              {(!items?.find((item: any) => item.day === 'Miércoles') || !items) && (
+                <Picker.Item label="Miércoles" value="Miércoles" />
+              )}
+              {(!items?.find((item: any) => item.day === 'Jueves') || !items) && (
+                <Picker.Item label="Jueves" value="Jueves" />
+              )}
+              {(!items?.find((item: any) => item.day === 'Viernes') || !items) && (
+                <Picker.Item label="Viernes" value="Viernes" />
+              )}
+              {(!items?.find((item: any) => item.day === 'Sábado') || !items) && (
+                <Picker.Item label="Sábado" value="Sábado" />
+              )}
+            </Picker>
+          </View>
+          <View className="flex-1 flex-row gap-3">
+            <Pressable
+              className="bg-[#007d97] rounded-[28px] shadow-md p-4 h-14 w-24"
+              onPress={handleAddSchedule}>
+              <Text className="text-white font-semibold text-center text-sm">Agregar</Text>
+            </Pressable>
+            <Pressable
+              className="bg-[#007d97] rounded-[28px] shadow-md p-4 h-14 w-24"
+              onPress={() => setOpenModal(false)}>
+              <Text className="text-white font-semibold text-center text-sm">Cancelar</Text>
+            </Pressable>
+          </View>
+        </NewModal>
       </View>
     </View>
   );
